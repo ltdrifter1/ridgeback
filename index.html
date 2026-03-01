@@ -5,9 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ridgeback Advisory — CFO-Level Clarity for Growing Businesses</title>
 <style>
-/* ─────────────────────────────────────────
-   iOS / Apple-style SF Pro system font stack
-   ───────────────────────────────────────── */
 :root {
   --sf: -apple-system, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
 
@@ -116,6 +113,8 @@ nav {
   border-radius: 20px !important;
   padding: 7px 18px !important;
   transition: background 0.18s, transform 0.18s !important;
+  cursor: pointer;
+  border: none;
 }
 .nav-cta:hover {
   background: var(--sage-light) !important;
@@ -154,7 +153,7 @@ nav {
 
 /* ── BUTTONS ── */
 .btn {
-  display: inline-flex; align-items: center; gap: 8px;
+  display: inline-flex; align-items: center; justify-content:center; gap: 8px;
   font-family: var(--sf);
   font-size: 0.88rem;
   font-weight: 500;
@@ -372,36 +371,29 @@ h1, h2, h3 {
   display:flex; align-items:flex-end; padding:28px;
   position:relative; overflow:hidden;
 }
+
 .portrait-glow {
   position:absolute; inset:0;
   background: radial-gradient(ellipse at 55% 25%, rgba(90,144,104,0.14), transparent 60%),
               linear-gradient(180deg, transparent 45%, rgba(8,15,9,0.9) 100%);
+  z-index: 1;
 }
-.portrait-mono {
-  position:absolute; top:50%; left:50%; transform:translate(-50%,-65%);
-  font-size:5rem; font-weight:800; letter-spacing:-0.04em;
-  color: rgba(168,196,174,0.1); pointer-events:none;
+
+/* Portrait photo sizing */
+.portrait-photo{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  object-position:center 20%;
+  z-index:0;
+  transform:scale(0.92);
 }
+
 .portrait-info { position:relative; z-index:2; }
 .portrait-name { font-size:1.3rem; font-weight:700; letter-spacing:-0.03em; }
 .portrait-role { font-size:0.72rem; font-weight:500; color:var(--sage-light); letter-spacing:0.08em; text-transform:uppercase; margin-top:4px; }
-
-
-   /* Portrait photo sizing */
-.portrait-photo{
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;           /* fills the card nicely */
-  object-position: center 20%; /* adjusts framing (less zoomed-in feel) */
-  z-index: 0;
-  transform: scale(0.92);      /* subtle zoom-out */
-}
-
-/* Keep overlay + text above the photo */
-.portrait-glow{ z-index: 1; }
-.portrait-info{ z-index: 2; }
 
 .about-body .headline { margin-bottom:14px; }
 .about-body .body-lg { margin-bottom:14px; }
@@ -456,6 +448,64 @@ footer {
   }
   .nav-hamburger { display:flex; }
 }
+
+/* ─────────────────────────────────────────
+   CONTACT MODAL (Email / Text / Call)
+   ───────────────────────────────────────── */
+.modal-backdrop{
+  position:fixed; inset:0; z-index:999;
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding: 24px;
+}
+.modal-backdrop.open{ display:flex; }
+
+.modal{
+  width: min(520px, 100%);
+  padding: 22px;
+  border-radius: var(--r-xl);
+}
+
+.modal-header{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+.modal-title{
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.modal-sub{
+  margin-top: 6px;
+  font-size: 0.85rem;
+  color: var(--mist);
+  line-height: 1.5;
+}
+.modal-close{
+  background: rgba(255,255,255,0.08);
+  border: 0.5px solid rgba(255,255,255,0.12);
+  color: var(--snow);
+  border-radius: 999px;
+  padding: 8px 12px;
+  cursor:pointer;
+}
+
+.modal-actions{
+  display:grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  margin-top: 14px;
+}
+.modal-actions .btn{
+  width:100%;
+}
 </style>
 </head>
 <body>
@@ -473,7 +523,7 @@ footer {
     <li><a href="#" class="nav-link" data-page="services">Services</a></li>
     <li><a href="#" class="nav-link" data-page="process">Process</a></li>
     <li><a href="#" class="nav-link" data-page="about">About</a></li>
-    <li><a href="mailto:ridgebackadvisory@hotmail.com" class="nav-cta">Book a Meeting</a></li>
+    <li><button class="nav-cta" type="button" onclick="openContact()">Book a Meeting</button></li>
   </ul>
   <div class="nav-hamburger" id="hamburger" onclick="toggleMenu()">
     <span></span><span></span><span></span>
@@ -498,7 +548,7 @@ footer {
             Helping business owners fix broken accounting systems, automate their back office, and build the financial visibility their growth demands.
           </p>
           <div class="hero-actions">
-            <a href="mailto:ridgebackadvisory@hotmail.com" class="btn btn-fill">Book a Meeting</a>
+            <button class="btn btn-fill" type="button" onclick="openContact()">Book a Meeting</button>
             <a href="#" class="btn btn-outline nav-link" data-page="services">View Services</a>
           </div>
         </div>
@@ -529,7 +579,7 @@ footer {
             </div>
           </div>
         </div>
-      </div>
+      </div><!-- /hero-grid -->
     </div>
   </section>
 
@@ -583,13 +633,12 @@ footer {
         <div class="eyebrow" style="justify-content:center;">Get Started</div>
         <h2 class="headline">Ready for CFO-Level<br>Financial Clarity?</h2>
         <p class="body-lg">Book a free Financial Systems Assessment — 90 minutes, no obligation, and you'll leave with a clear picture of exactly what needs to change.</p>
-        <a href="mailto:ridgebackadvisory@hotmail.com" class="btn btn-fill">Book a Meeting</a>
+        <button class="btn btn-fill" type="button" onclick="openContact()">Book a Meeting</button>
       </div>
     </div>
   </section>
 
 </div><!-- /page-home -->
-
 
 <!-- ══════════════════════════════════════════
      PAGE: SERVICES
@@ -653,14 +702,13 @@ footer {
 
     <div style="text-align:center; margin-top:60px;" class="animate">
       <p class="body-lg" style="max-width:480px; margin:0 auto 28px;">
-        Not sure which engagement fits? Start with a free consltation — it tells us both exactly what you need.
+        Not sure which engagement fits? Start with a free consultation — it tells us both exactly what you need.
       </p>
-      <a href="mailto:ridgebackadvisory@hotmail.com" class="btn btn-fill">Book a Meeting</a>
+      <button class="btn btn-fill" type="button" onclick="openContact()">Book a Meeting</button>
     </div>
 
   </div>
 </div><!-- /page-services -->
-
 
 <!-- ══════════════════════════════════════════
      PAGE: PROCESS
@@ -729,12 +777,11 @@ footer {
     </div>
 
     <div style="text-align:center; margin-top:64px;" class="animate">
-      <a href="mailto:ridgebackadvisory@hotmail.com" class="btn btn-fill">Book a Meeting</a>
+      <button class="btn btn-fill" type="button" onclick="openContact()">Book a Meeting</button>
     </div>
 
   </div>
 </div><!-- /page-process -->
-
 
 <!-- ══════════════════════════════════════════
      PAGE: ABOUT
@@ -749,7 +796,7 @@ footer {
         <div class="portrait-glow"></div>
         <img src="ltd.PNG" alt="Luke Guthrie" class="portrait-photo">
         <div class="portrait-info">
-        <div class="portrait-name">Luke Guthrie</div>  
+          <div class="portrait-name">Luke Guthrie</div>
           <div class="portrait-role">CPA, CA · Founder</div>
         </div>
       </div>
@@ -757,32 +804,30 @@ footer {
       <div class="about-body animate-d1">
         <h1 class="headline" style="margin-bottom:14px;">CFO-Level Operator.<br>Driving strategy, growth and financial leadership.</h1>
         <div class="divider"></div>
-         <p class="body-lg">
-    I’m a Chartered Accountant with 15+ years in finance — from Big 4 audit at Deloitte to Controller roles in high-growth, multi-site businesses. I’ve seen what weak systems cost: slow closes, unclear margins, cash surprises, and decisions made without reliable data. I build finance functions that make the numbers trustworthy and the business easier to run.
-  </p>
+        <p class="body-lg">
+          I’m a Chartered Accountant with 15+ years in finance — from Big 4 audit at Deloitte to Controller roles in high-growth, multi-site businesses. I’ve seen what weak systems cost: slow closes, unclear margins, cash surprises, and decisions made without reliable data. I build finance functions that make the numbers trustworthy and the business easier to run.
+        </p>
 
-  <p class="body-lg" style="margin-top:14px;">
-    I’m based in Cumberland, BC and work remotely with owners across Canada and the US. My focus is simple: give you clean reporting, better processes, and forward-looking visibility so you can lead with confidence — and have more room for the parts of life you’re building the business for.
-  </p>
+        <p class="body-lg" style="margin-top:14px;">
+          I’m based in Cumberland, BC and work remotely with owners across Canada and the US. My focus is simple: give you clean reporting, better processes, and forward-looking visibility so you can lead with confidence — and have more room for the parts of life you’re building the business for.
+        </p>
 
-  <ul class="cred-list">
-    <li><span class="cred-dot"></span>Chartered Professional Accountant (CPA, CA) — BC &amp; Ontario</li>
-    <li><span class="cred-dot"></span>Deloitte LLP — led audit engagements for TSX-listed companies with $10B+ revenues</li>
-    <li><span class="cred-dot"></span>Controller through a $30M+ scale-up within a single fiscal year</li>
-    <li><span class="cred-dot"></span>Led ERP transition and financial integration across a multi-site national acquisition</li>
-    <li><span class="cred-dot"></span>Deep expertise with  all software, custom finanical reporting, IFRS, ASPE, cross-border tax, and multi-entity consolidations</li>
-  </ul>
-
+        <ul class="cred-list">
+          <li><span class="cred-dot"></span>Chartered Professional Accountant (CPA, CA) — BC &amp; Ontario</li>
+          <li><span class="cred-dot"></span>Deloitte LLP — led audit engagements for TSX-listed companies with $10B+ revenues</li>
+          <li><span class="cred-dot"></span>Controller through a $30M+ scale-up within a single fiscal year</li>
+          <li><span class="cred-dot"></span>Led ERP transition and financial integration across a multi-site national acquisition</li>
+          <li><span class="cred-dot"></span>Deep expertise across modern finance tools, custom reporting, IFRS, ASPE, cross-border tax, and multi-entity consolidations</li>
+        </ul>
 
         <div style="margin-top:36px;">
-          <a href="mailto:ridgebackadvisory@hotmail.com" class="btn btn-fill">Book a Meeting</a>
+          <button class="btn btn-fill" type="button" onclick="openContact()">Book a Meeting</button>
         </div>
       </div>
     </div>
 
   </div>
 </div><!-- /page-about -->
-
 
 <!-- ══════════════════════════════════════════ FOOTER -->
 <footer>
@@ -798,6 +843,24 @@ footer {
   </div>
 </footer>
 
+<!-- ══════════════════ CONTACT MODAL ══════════════════ -->
+<div class="modal-backdrop" id="contactModal" role="dialog" aria-modal="true" aria-hidden="true">
+  <div class="glass modal">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title">Book a Meeting</div>
+        <div class="modal-sub">Choose how you’d like to reach out.</div>
+      </div>
+      <button class="modal-close" type="button" onclick="closeContact()" aria-label="Close">✕</button>
+    </div>
+
+    <div class="modal-actions">
+      <a class="btn btn-fill" href="mailto:ridgebackadvisory@hotmail.com?subject=Book%20a%20Meeting%20-%20Ridgeback%20Advisory">Email</a>
+      <a class="btn btn-outline" href="sms:+12502010936">Text</a>
+      <a class="btn btn-outline" href="tel:+12502010936">Call</a>
+    </div>
+  </div>
+</div>
 
 <!-- ══════════════════ JS ══════════════════ -->
 <script>
@@ -841,6 +904,27 @@ window.addEventListener('scroll', function() {
     window.scrollY > 20
       ? 'rgba(8,15,9,0.88)'
       : 'rgba(10,20,11,0.72)';
+});
+
+// ── Contact modal ──
+function openContact(){
+  const m = document.getElementById('contactModal');
+  m.classList.add('open');
+  m.setAttribute('aria-hidden','false');
+}
+function closeContact(){
+  const m = document.getElementById('contactModal');
+  m.classList.remove('open');
+  m.setAttribute('aria-hidden','true');
+}
+// Close on backdrop click + ESC
+document.addEventListener('click', (e) => {
+  const m = document.getElementById('contactModal');
+  if (!m) return;
+  if (m.classList.contains('open') && e.target === m) closeContact();
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeContact();
 });
 </script>
 </body>
